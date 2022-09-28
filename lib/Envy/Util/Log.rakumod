@@ -66,9 +66,7 @@ sub messagef(*@as --> Nil) is export {
 }
 sub problem(Str:D $s --> Nil) is export {
   s('!!>', $s, :pipe($*ERR)) if $LL <= 4;
-  exit 1;
 }
 sub problemf(*@as --> Nil) is export {
   s('!!>', sprintf(|@as), :pipe($*ERR)) if $LL <= 4;
-  exit 1;
 }

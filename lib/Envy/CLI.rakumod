@@ -5,6 +5,47 @@ use Envy::Util::Ls;
 
 { @*ARGS = set-ll-from-args(|@*ARGS); };
 
+multi MAIN('help', Str:D $command = '') is export {
+  if $command eq '' {
+    say(qq:to/END/);
+      Envy - A Raku Environment Manager
+
+      USAGE
+        
+        envy [flags] command [args]
+
+      COMMANDS
+        
+        version                 Displays the currently running version of Envy
+        ls                      Lists all of the repositories controlled by Envy
+        config                  Shows the current config formatted as JSON
+        help <command>?         Displays help for the given command if available
+        init <name>             Initializes a new virtual environment with id Envy#<name>
+        enable [<name> ...]     Enables all of the repositories listed, this command
+                                takes a comprehensive list of what you'd like enabled
+
+      FLAGS
+
+        --silent            Produces no output
+        --debug             A lot of output that is useful while debugging
+        --info              More output than --silent but less than --debug, sometimes
+
+      CONFIGURATION
+
+        config path = {config<config-path>}
+        repo store  = {config<lib>}
+        shim file   = {config<shim>}
+    END
+  } else {
+    problemf('no help available for %s', $command);
+    exit 1;
+  }
+}
+
+multi MAIN('version') is export {
+  say $?DISTRIBUTION.meta<ver>;
+}
+
 multi MAIN('init', Str() $name is copy) is export {
   CATCH { default { pf('a problem occurred: %s', $_,); } }
   my $base = config<path>.IO;
@@ -61,7 +102,7 @@ E
  
   my %m = ( ls().map(* => 1) );
   config<shim>.IO.spurt: @names.map({
-    problemf('%s not found', $_) unless %m{$_};
+    problemf('%s not found', $_), exit 1 unless %m{$_};
     'export RAKUDOLIB="Envy#'~$_~', $RAKUDOLIB"'
   }).join("\n");
 }
