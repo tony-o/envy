@@ -1,0 +1,12 @@
+{
+  "name":"Envy",
+  "provides":{"Envy": "lib/Envy.rakumod",
+              "Envy::CLI": "lib/Envy/CLI.rakumod",
+              "Envy::Util::CRC32": "lib/Envy/Util/CRC32.rakumod",
+              "Envy::Config": "lib/Envy/Config.rakumod",
+              "Envy::Util::Ls": "lib/Envy/Util/Ls.rakumod",
+              "Envy::Util::Log": "lib/Envy/Util/Log.rakumod"
+             },
+  "auth":"zef:tony-o",
+  "version":0
+}
