@@ -9,12 +9,12 @@ has %!loaded;
 has CompUnit::Repository::Installation $!cur handles <need upgrade-repository install uninstall files candidates resolve resource loaded distribution installed precomp-store precomp-repository provides-warning can-install>;
 
 submethod TWEAK(:$prefix is copy, :$next-repo --> Nil) {
-  $prefix.=trim;
-  if $prefix.trim eq '' {
+  $prefix  = ($prefix//'').trim;
+  $!prefix = $prefix;
+  if $prefix eq '' {
     $!cur = $next-repo;
     return;
   }
-  $!prefix  = $prefix;
   
   my @repos     = $prefix.split(':').reverse;
   my $lnr      := $next-repo;

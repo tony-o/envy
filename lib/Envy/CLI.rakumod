@@ -2,6 +2,7 @@ use Envy::Config;
 use Envy::Util::CRC32;
 use Envy::Util::Log;
 use Envy::Util::Ls;
+use Envy::Util::Dir;
 
 { @*ARGS = set-ll-from-args(|@*ARGS); };
 
@@ -20,9 +21,10 @@ multi MAIN('help', Str:D $command = '') is export {
         ls                      Lists all of the repositories controlled by Envy
         config                  Shows the current config formatted as JSON
         help <command>?         Displays help for the given command if available
-        init <name>             Initializes a new virtual environment with id Envy#<name>
-        enable [<name> ...]     Enables all of the repositories listed, this command
-                                takes a comprehensive list of what you'd like enabled
+        init [<name> ...]       Initializes a new virtual environment with id Envy#<name>
+        enable [<name> ...]     Adds the names to the enabled repository list
+        disable [<name> ...]    Removes the names from the enabled repository list
+        destroy [<name> ...]    Destroys the the repository and purges the records
 
       FLAGS
 
@@ -36,6 +38,61 @@ multi MAIN('help', Str:D $command = '') is export {
         repo store  = {config<lib>}
         shim file   = {config<shim>}
     END
+  } elsif $command eq 'init' {
+    say(qq:to/END/);
+      Envy - A Raku Environment Manager
+
+      envy [-e|--enable] init [<names> ...]
+
+      This command will initialize repos with the names provided.  The `-e` or `--enable` flag
+      will automatically enable the repos after initializing.  Ex.
+
+      \$ envy -e init aaa bbb ccc
+      ==> created aaa
+          to install to this repo with zef use:
+            zef install --to='Envy#aaa' <your modules>
+      ==> created bbb
+          to install to this repo with zef use:
+            zef install --to='Envy#bbb' <your modules>
+      ==> created ccc
+          to install to this repo with zef use:
+            zef install --to='Envy#ccc' <your modules>
+      ==> Enabled repositories: aaa, bbb, ccc 
+    END
+  } elsif $command eq 'destroy' {
+    say(qq:to/END/);
+      Envy - A Raku Environment Manager
+      
+      destroy [<name> ...]
+
+      Destroys the repository. This will automatically disable the repository if it's
+      presently enabled and will remove the repository. Use this if you'd like to
+      remove the repository from the system.  To reset a repository you'd use this
+      command followed by an init.
+    END
+  } elsif $command ~~ 'enable'|'disable' {
+    say(qq:to/END/);
+      Envy - A Raku Environment Manager
+
+      enable [<name> ...]     Adds the names to the enabled repository list
+      disable [<name> ...]    Removes the names from the enabled repository list
+
+      These commands enable or disable the repositories for the system.  This action
+      is not localized to a session or terminal window and will affect any raku
+      processes that are started with the `Env#` repository enabled after this command.
+    END
+  } elsif $command eq 'help' {
+    say(qq:to/END/);
+      __/\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\__/\\\\\\\\\\_____/\\\\\\__/\\\\\\________/\\\\\\__/\\\\\\________/\\\\\\_
+       _\\/\\\\\\///////////__\\/\\\\\\\\\\\\___\\/\\\\\\_\\/\\\\\\_______\\/\\\\\\_\\///\\\\\\____/\\\\\\/__
+        _\\/\\\\\\_____________\\/\\\\\\/\\\\\\__\\/\\\\\\_\\//\\\\\\______/\\\\\\____\\///\\\\\\/\\\\\\/____
+         _\\/\\\\\\\\\\\\\\\\\\\\\\_____\\/\\\\\\//\\\\\\_\\/\\\\\\__\\//\\\\\\____/\\\\\\_______\\///\\\\\\/______
+          _\\/\\\\\\///////______\\/\\\\\\\\//\\\\\\\\/\\\\\\___\\//\\\\\\__/\\\\\\__________\\/\\\\\\_______
+           _\\/\\\\\\_____________\\/\\\\\\_\\//\\\\\\/\\\\\\____\\//\\\\\\/\\\\\\___________\\/\\\\\\_______
+            _\\/\\\\\\_____________\\/\\\\\\__\\//\\\\\\\\\\\\_____\\//\\\\\\\\\\____________\\/\\\\\\_______
+             _\\/\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_\\/\\\\\\___\\//\\\\\\\\\\______\\//\\\\\\_____________\\/\\\\\\_______
+              _\\///////////////__\\///_____\\/////________\\///______________\\///________
+    END
   } else {
     problemf('no help available for %s', $command);
     exit 1;
@@ -44,6 +101,21 @@ multi MAIN('help', Str:D $command = '') is export {
 
 multi MAIN('version') is export {
   say $?DISTRIBUTION.meta<ver>;
+}
+
+multi MAIN('destroy', *@names is copy) is export {
+  CATCH { default { pf('a problem occurred: %s', $_,); } }
+  my @four04 = (@names (-) ls()).keys;
+
+  problemf('%s repo does not exist, refusing to proceed', @four04.join(', ')),
+  exit 1
+    if @four04.elems > 0;
+
+  MAIN('disable', |@names);
+  for @names -> $n {
+    rmd(config<lib>.IO.child($n).IO);
+  };
+  messagef('Destroyed repositories: %s', @names.join(', '));
 }
 
 multi MAIN('init', Bool:D :e(:$enable) = False, *@names is copy) is export {
