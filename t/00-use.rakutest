@@ -1,0 +1,11 @@
+use Test;
+
+plan 7;
+
+use-ok('Envy');
+use-ok('Envy::CLI');
+use-ok('Envy::Util::CRC32');
+use-ok('Envy::Config');
+use-ok('Envy::Util::Ls');
+use-ok('Envy::Util::Dir');
+use-ok('Envy::Util::Log');

@@ -12,5 +12,5 @@ sub crc32_hex(Str:D $str, $crc is copy = 0xffffffff --> Str:D) is export {
     $crc = ($crc +> 8) +^ @table[($crc +& 0xff) +^ $b];
   }
 
-  ($crc +^ 0xffffffff).base(16).Str;
+  sprintf '%08X', ($crc +^ 0xffffffff);
 }

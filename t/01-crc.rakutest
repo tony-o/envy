@@ -1,0 +1,19 @@
+use Test;
+
+use Envy::Util::CRC32;
+
+my $cases = {
+  "" => "00000000",
+  "a" => "e8b7be43",
+  "abc"  => "352441c2",
+  "message digest"  => "20159d7f",
+  "abcdefghijklmnopqrstuvwxyz"  => "4c2750bd",
+  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"  => "1fc2e6d2",
+  "12345678901234567890123456789012345678901234567890123456789012345678901234567890"  => "7ca94a72"
+};
+
+plan $cases.keys.elems;
+
+for $cases.kv -> $k, $v {
+  ok crc32_hex($k).lc eq $v.lc, "crc32_hex($k) => expect:{$v},got:{crc32_hex($k)}";
+};

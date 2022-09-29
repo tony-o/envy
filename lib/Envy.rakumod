@@ -6,7 +6,7 @@ use Envy::Util::Ls;
 
 has $!prefix;
 has %!loaded;
-has CompUnit::Repository::Installation $!cur handles <need upgrade-repository install uninstall files candidates resolve resource loaded distribution installed precomp-store precomp-repository provides-warning can-install>;
+has CompUnit::Repository $!cur handles <need upgrade-repository install uninstall files candidates resolve resource loaded distribution installed precomp-store precomp-repository provides-warning can-install>;
 
 submethod TWEAK(:$prefix is copy, :$next-repo --> Nil) {
   $prefix  = ($prefix//'').trim;
