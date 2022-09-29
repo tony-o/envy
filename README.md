@@ -6,7 +6,7 @@ A nice utility for managing your dist environments. With this utility you can en
 
 If you want to fill up your terminal with message, all of these commands will also take `--debug`, `--info`, `--silent`, `--loglevel=<Int>` flags.  `--silent` is only effective in commands where output is not required, `config` and `version` below both ignore this flag.
 
-### [-e|--enable = False] init [<names> ...]
+### [-e|--enable = False] init [\<names> ...]
 
 Allows you to initialize multiple repos for general use and the `-e` flag provides a shortcut for enabling all of the provided repos.
 
@@ -25,11 +25,11 @@ Displays the repos that are managed by `envy`.  A `+<name>` indicates the repo i
 ==> - test
 ```
 
-### enable [<names> ...]
+### enable [\<names> ...]
 
 Enables the given repos system wide.
 
-### disable [<names> ...]
+### disable [\<names> ...]
 
 Disables the given repos system wide.
 
@@ -41,7 +41,7 @@ Displays the given config without any other marks so it can be piped to a format
 
 Displays the currently running version of envy.
 
-### help [<command>]
+### help [\<command>]
 
 Command is optional, displays help for the given command or for envy in general.
 
