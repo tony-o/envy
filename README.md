@@ -49,6 +49,10 @@ Enables the given repos system wide.
 
 Disables the given repos system wide.
 
+### destroy [\<names> ...]
+
+Disables and then removes that repository from the file system.
+
 ### config
 
 Displays the given config without any other marks so it can be piped to a formatter if desired.
