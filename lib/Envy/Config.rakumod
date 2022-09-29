@@ -11,6 +11,7 @@ state $config = $path.IO.f
              !! { lib         => $guess.IO.child("envy/lib").IO.absolute,
                   config-path => $path.IO.absolute,
                   shim        => $guess.IO.child("envy/shim").IO.absolute,
+                  enabled     => $guess.IO.child("envy/enabled").IO.absolute,
                   path        => $guess.IO.child("envy").IO.absolute, };
 
 df("config path: %s\njson: %s", $path, $config);
@@ -32,7 +33,12 @@ unless $config<lib>.IO.d {
 
 unless $config<shim>.IO.f {
   df("creating shim: %s", $config<shim>);
-  $config<shim>.IO.spurt: 'export RAKUDOLIB=\'"Envy#."\'' ~ "\n";
+  $config<shim>.IO.spurt: 'export RAKUDOLIB="Envy#"' ~ "\n";
+}
+
+unless $config<enabled>.IO.f {
+  df("creating empty enabled file: %s", $config<enabled>);
+  $config<enabled>.IO.spurt: '';
 }
 
 sub config(--> Hash:D) is export { $config };

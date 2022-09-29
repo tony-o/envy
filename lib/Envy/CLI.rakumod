@@ -82,27 +82,55 @@ multi MAIN('init', Str() $name is copy) is export {
 
 multi MAIN('ls') is export {
   CATCH { default { pf('a problem occurred: %s', $_,); } }
-  ls().map(&message);
+  my %enabled = ( enabled().map(* => 1) );
+  ls().map({ message(%enabled{$_} ?? "+ $_" !! "- $_") });
 }
 
 multi MAIN('config') is export {
   say(to-json(config.hash));
 }
 
-multi MAIN('enable', Bool :s(:$safe) = True, *@names ($, *@)) is export {
-  w(qq:to/E/) unless (%*ENV<RAKUDOLIB>//'').index('Envy#');
+sub show-shim(&c = &message) {
+  my $bashrc = (".bashrc", ".bash_profile").first({try "$*HOME/$_".IO.f}) // '.bashrc';
+  c(qq:to/END/);
 RAKUDOLIB does not contain any Envy# entries in this environment
 
   for bash:
-    echo 'source {config<shim>}' >> ~/{(".bashrc", ".bash_profile").first({try "$*HOME/$_".IO.f}) // ".bashrc"}
+    echo 'source {config<shim>}' >> ~/{$bashrc}
+    source ~/{$bashrc} 
 
   for zsh:
     echo 'source {config<shim>}' >> ~/.zshenv
-E
+    source ~/.zshenv
+END
+}
+
+multi MAIN('enable', *@names ($, *@)) is export {
+  if ! (%*ENV<RAKUDOLIB> // '').contains('Envy#') {
+    show-shim(&w);
+  }
+
+  @names.push(|enabled());
+  @names.=unique.sort;
  
   my %m = ( ls().map(* => 1) );
-  config<shim>.IO.spurt: @names.map({
-    problemf('%s not found', $_), exit 1 unless %m{$_};
-    'export RAKUDOLIB="Envy#'~$_~', $RAKUDOLIB"'
-  }).join("\n");
+  my @ps = @names.grep({ %m{$_}:!exists });
+  problemf('Repositories \'%s\' not initialized, please use `envy init \'%s\'` to initialize them',
+           @ps.join('\', \''),
+           @ps.join('\' \'')),
+  exit 1
+    if @ps.elems > 0;
+
+  config<enabled>.IO.spurt: @names.join("\n");
+  messagef('Enabled repositories: %s', @names.join(', '));
+}
+
+multi MAIN('disable', *@names ($, *@)) is export {
+  if ! (%*ENV<RAKUDOLIB> // '').contains('Envy#') {
+    show-shim(&w);
+  }
+
+  my @enabled = (enabled() (^) @names).keys.List;
+  config<enabled>.IO.spurt: @enabled.join("\n");
+  messagef('Disabled repositories: %s', @names.join(', '));
 }

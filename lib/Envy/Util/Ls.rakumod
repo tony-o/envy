@@ -2,7 +2,20 @@ unit module Envy::Util::Ls;
 use Envy::Config;
 use Envy::Util::Log;
 
-sub ls() is export {
+sub enabled(--> List) is export {
+  my $nv = (%*ENV<RAKUDOLIB>//'').match(/'Envy#' $<s>=<-[,]>+/);
+  if $nv !~~ Match {
+    if (%*ENV<RAKUDOLIB>//'').contains(/'Envy#'/) && config<path>.IO.child('enabled').f {
+      my $ds = config<path>.IO.child('enabled').IO.slurp;
+      return () if $ds.trim eq '';
+      return $ds.split("\n").grep(*.trim ne '').List;
+    }
+    return ();
+  }
+  $nv<s>.Str.split(':').List;
+}
+
+sub ls(--> List) is export {
   my $home = config<lib>.IO;
   my @ds;
   for dir($home) -> $d {
@@ -13,5 +26,5 @@ sub ls() is export {
       @ds.push: $d.basename;
     }
   }
-  @ds.sort;
+  @ds.sort.List;
 }
