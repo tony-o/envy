@@ -1,6 +1,6 @@
 # envy
 
-A nice utility for managing your dist environments. With this utility you can enable and disable certain module repositories across sessions.  Each repo is self contained and can easily be reset/updated without affecting the system's modules.
+A nice utility for managing your dist environments. With this utility you can enable and disable certain module repositories without affecting the system wide repositories.  Each repo is self contained and can easily be reset/updated without affecting the system's modules.
 
 ## usage
 
