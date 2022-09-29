@@ -2,6 +2,12 @@
 
 A nice utility for managing your dist environments. With this utility you can enable and disable certain module repositories without affecting the system wide repositories.  Each repo is self contained and can easily be reset/updated without affecting the system's modules.
 
+## installation
+
+```
+$ zef install Envy
+```
+
 ## usage
 
 If you want to fill up your terminal with message, all of these commands will also take `--debug`, `--info`, `--silent`, `--loglevel=<Int>` flags.  `--silent` is only effective in commands where output is not required, `config` and `version` below both ignore this flag.
