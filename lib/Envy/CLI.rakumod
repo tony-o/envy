@@ -46,38 +46,45 @@ multi MAIN('version') is export {
   say $?DISTRIBUTION.meta<ver>;
 }
 
-multi MAIN('init', Str() $name is copy) is export {
+multi MAIN('init', Bool:D :e(:$enable) = False, *@names is copy) is export {
   CATCH { default { pf('a problem occurred: %s', $_,); } }
+  my %exists = ( ls().map(* => 1) );
+
+  my @errs = @names.grep({%exists{$_}:exists});
+
+  problemf('%s repo%s already exist%s, refusing to proceed',
+           @errs.join(', '),
+           @errs.elems == 1 ?? '' !! 's',
+           @errs.elems == 1 ?? 's' !! ''),
+  exit 1
+    if @errs.elems > 0;
+
   my $base = config<path>.IO;
-  unless $base.d {
-    df('creating envy home: %s', $base.absolute);
-    mkdir $base.absolute;
-  }
-  if $name eq '.' {
-    $name = crc32_hex($*CWD.absolute);
-  }
-  my $lib = config<lib>.IO;
-  unless $lib.d  {
-    df('creating envy lib: %s', $lib.absolute);
-    mkdir $lib.absolute;
-  }
-  my $dir = $lib.child("$name").IO;
-  if $dir.d {
-    lf("envy library already exists @ %s", $dir.absolute);
-  } else {
-    lf("creating library directory @ %s", $dir.absolute);
-    mkdir $dir.absolute;
-  }
+  for @names -> $name {
+    if $name eq '.' {
+      $name = crc32_hex($*CWD.absolute);
+    }
+    my $lib = config<lib>.IO;
+    unless $lib.d  {
+      df('creating envy lib: %s', $lib.absolute);
+      mkdir $lib.absolute;
+    }
+    my $dir = $lib.child("$name").IO;
+    if $dir.d {
+      lf("envy library already exists @ %s", $dir.absolute);
+    } else {
+      lf("creating library directory @ %s", $dir.absolute);
+      mkdir $dir.absolute;
+    }
 
-  lf("to hardcode this repo into your environment add the following to your environment:\n  RAKUDOLIB='Envy#%s'",
-     $name);
-  lf("to install to this repo with zef use:\n  zef install --to='Envy#%s' <your modules>",
-     $name);
+    messagef("created %s\nto install to this repo with zef use:\n  zef install --to='Envy#%s' <your modules>", $name, $name);
 
-  unless $dir.child('name').IO.f {
-    df('creating %s', $dir.child('name').IO.absolute);
-    $dir.child('name').IO.spurt($name);
+    unless $dir.child('name').IO.f {
+      df('creating %s', $dir.child('name').IO.absolute);
+      $dir.child('name').IO.spurt($name);
+    }
   }
+  MAIN('enable', |@names) if $enable;
 }
 
 multi MAIN('ls') is export {
@@ -130,7 +137,7 @@ multi MAIN('disable', *@names ($, *@)) is export {
     show-shim(&w);
   }
 
-  my @enabled = (enabled() (^) @names).keys.List;
+  my @enabled = (enabled() (^) @names).keys.sort.List;
   config<enabled>.IO.spurt: @enabled.join("\n");
   messagef('Disabled repositories: %s', @names.join(', '));
 }
