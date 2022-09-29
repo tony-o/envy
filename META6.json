@@ -1,13 +1,22 @@
 {
-  "name":"Envy",
+  "name":"envy",
   "provides":{"Envy": "lib/Envy.rakumod",
               "Envy::CLI": "lib/Envy/CLI.rakumod",
               "Envy::Util::CRC32": "lib/Envy/Util/CRC32.rakumod",
               "Envy::Config": "lib/Envy/Config.rakumod",
               "Envy::Util::Ls": "lib/Envy/Util/Ls.rakumod",
               "Envy::Util::Dir": "lib/Envy/Util/Dir.rakumod",
-              "Envy::Util::Log": "lib/Envy/Util/Log.rakumod"
-             },
+              "Envy::Util::Log": "lib/Envy/Util/Log.rakumod"},
+  "api": "0",
+  "description": "Dist environment manager for raku!",
+  "license": "Artistic-2.0",
+  "build-depends": [],
+  "test-depends": [ "Test:ver<6.c+>" ],
+  "depends": [],
+  "authors": ["Tony O'Dell"],
+  "support": {"bugtracker": "https://github.com/tony-o/envy/issues",
+              "source": "https://github.com/tony-o/envy.git"},
+  "tags": ["distribution", "ecosystem", "toolchain", "development", "dev"],
   "auth":"zef:tony-o",
-  "version":0
+  "version": "0.0.1"
 }
