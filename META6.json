@@ -18,5 +18,5 @@
               "source": "https://github.com/tony-o/envy.git"},
   "tags": ["distribution", "ecosystem", "toolchain", "development", "dev"],
   "auth":"zef:tony-o",
-  "version": "0.0.1"
+  "version": "0.0.2"
 }

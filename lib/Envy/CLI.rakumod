@@ -11,6 +11,10 @@ multi MAIN('help', Str:D $command = '') is export {
     say(qq:to/END/);
       Envy - A Raku Environment Manager
 
+      STATUS
+
+        {"{%*ENV<RAKULIB>}:{%*ENV<RAKUDOLIB>}" ~~ m{(^||':')'Envy#'(':'||$)} ?? 'Enabled' !! 'Disabled'}
+
       USAGE
         
         envy [flags] command [args]
