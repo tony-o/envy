@@ -13,7 +13,10 @@ submethod TWEAK(:$prefix is copy, :$next-repo --> Nil) {
   $prefix  = ($prefix//'').trim;
   $!prefix = $prefix;
   if $prefix eq '' {
-    $!cur = $next-repo;
+    $!cur = CompUnit::Repository::Installation.new(
+      prefix    => $*TMPDIR.child(('0' ... '9', 'A' ... 'Z', 'a' ... 'z').pick(15).join('')),
+      next-repo => $next-repo,
+    );
     return;
   }
   
