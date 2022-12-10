@@ -20,3 +20,15 @@ sub ls(--> List) is export {
   }
   @ds.sort.List;
 }
+
+sub rmt($dir --> List) is export {
+  for dir($dir) -> $d {
+    if $d.d {
+      rmt($d);
+      rmdir($d);
+    } else {
+      unlink($d);
+    }
+  }
+  rmdir $dir;
+}
